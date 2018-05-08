@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<!-- saved from url=(0057)file:///Users/ziv/Downloads/project/%20promise/index.html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=0.5, maximum-scale=0.5, minimum-scale=0.5, user-scalable=no">
+    <meta name="x5-fullscreen" content="true">
+    <meta name="full-screen" content="yes">
+    <title>Promise</title>
+    <link rel="stylesheet" href="./Promise_files/bootstrap.min.css">
+    <style>
+        .logo {
+            width: auto;
+            height: auto;
+            margin: auto;
+        }
+
+         .contenner{
+            background: #FD7E00;
+            height: 1500px;
+        }
+
+        .add_banner{
+            width: 90%;
+            margin: auto;
+        }
+
+        .add_value{
+            width: 60%;
+            height: 50px;
+        }
+
+        .temp_div{
+            margin-top: 20px;
+        }
+
+        .add_name{
+            height: 50px;
+            width: 20%;
+            margin-left: 6px;
+        }
+
+        .add_banner button{
+            width: 10%;
+            height: 50px;
+            margin-left: 6px;
+        }
+
+        .show_data {
+            width: 80%;
+            margin: auto;
+        }
+
+        .show_data font{
+            color: white;
+        }
+
+        .show_data li{
+            border-bottom:1px solid #ccc;
+        }
+
+        
+
+    </style>
+<style type="text/css"></style></head>
+
+<body>
+<div class="contenner">
+    <div class="logo">
+        <div class="img logo_rotate" align="center">
+            <img src="./Promise_files/logo.png" align="center">
+        </div>
+        <div align="center">
+        <font size="5" color="white" align="center">让全世界见证你许下的诺言</font>
+        </div>
+    </div>
+    <div class="add_banner" align="center">
+        <div class="temp_div">
+        <input type="text" class="add_value" width="1000" placeholder="写下你的诺言">
+        <input type="text" class="add_name" placeholder="你的名字">
+        <button id="push">提交</button>
+        </div>
+    </div>
+    <div class="show_data">
+        <div id="myList" class="temp_div"><ul style="list-style-type:none"><li><div><font size="6">12</font></div><div align="right"> <font size="5">1234</font>&nbsp;&nbsp;&nbsp;<font size="5">2018/5/8</font><div></div></div></li></ul></div>
+
+</div>
+<script src="./Promise_files/jquery-3.3.1.min.js"></script>
+<script src="./Promise_files/nebPay.js"></script>
+<script src="./Promise_files/bootstrap.min.js"></script>
+<script src="./Promise_files/nebulas.js"></script>
+<script>
+
+    "use strict";
+
+    var dappAddress = "n1yY2s3tHi2M9N1MaXCyuVecBcGPMMBs9XV";
+
+    var nebulas = require("nebulas"),
+        Account = nebulas.Account,
+        neb = new nebulas.Neb();
+    neb.setRequest(new nebulas.HttpRequest("https://testnet.nebulas.io"));
+
+
+    window.onload = function(){
+
+            getData();
+    }
+
+
+    function getData(){
+
+        var from = Account.NewAccount().getAddressString();
+        var value = "0";
+        var nonce = "0"
+        var gas_price = "1000000"
+        var gas_limit = "2000000"
+        var callFunction = "forEach";
+        //var callArgs = "[\"" + $("#search_value").val() + "\"]"; //in the form of ["args"]
+        var callArgs = "[\"100000\",\"0\"]"
+        var contract = {
+            "function": callFunction,
+            "args": callArgs
+    }   
+    neb.api.call(from,dappAddress,value,nonce,gas_price,gas_limit,contract).then(function (resp) {
+        showData(resp)
+    }).catch(function (err) {
+        //cbSearch(err)
+        console.log("error:" + err.message)
+    })
+    }
+
+    function showData(resp){
+        var myJson = resp.result   
+        try{
+            myJson = JSON.parse(myJson)
+        }catch (err){
+                //result is the error message
+        }
+
+        var myList = document.getElementById("myList");
+		
+		var ulText = "<ul style=\"list-style-type:none\">";
+		
+		if(myJson.length > 0){
+			for(var i=0;i<myJson.length;i++){
+                var newDate = new Date();
+                newDate.setTime(parseInt(myJson[i].time));
+                var date = newDate.toLocaleDateString();
+				ulText += "<li><div><font size=\"6\">" + myJson[i].value + "</font></div><div align=\"right\"> <font size=\"5\">" + myJson[i].name + "</font>&nbsp&nbsp&nbsp<font size=\"5\">" + date + "</font><div></li>";
+			}
+		}	
+		ulText += "</ul>";
+        myList.innerHTML = ulText;
+    }
+
+
+    var NebPay = require("nebpay");     //https://github.com/nebulasio/nebPay
+    var nebPay = new NebPay();
+    var serialNumber
+
+    $("#push").click(function() {
+
+        var to = dappAddress;
+        var value = "0";
+        var callFunction = "save"
+        var key = new Date().getTime()
+        var callArgs = "[\"" + key + "\",\"" + $("#add_value").val() + "\",\"" + $("#add_name").val() + "\"]"
+
+        serialNumber = nebPay.call(to, value, callFunction, callArgs, {    //使用nebpay的call接口去调用合约,
+            listener: cbPush        //设置listener, 处理交易返回信息
+        });
+
+        intervalQuery = setInterval(function () {
+            funcIntervalQuery();
+        }, 5000);
+    });
+
+    var intervalQuery
+
+    function funcIntervalQuery() {
+        nebPay.queryPayInfo(serialNumber)   //search transaction result from server (result upload to server by app)
+            .then(function (resp) {
+                console.log("tx result: " + resp)   //resp is a JSON string
+                var respObject = JSON.parse(resp)
+                if(respObject.code === 0){
+                    alert(`set ${$("#search_value").val()} succeed!`)
+                    clearInterval(intervalQuery)
+                }
+            })
+            .catch(function (err) {
+                console.log(err);
+            });
+    }
+
+    function cbPush(resp) {
+        console.log("response of push: " + JSON.stringify(resp))
+    }
+
+</script>
+
+
+
+</div></body></html>
