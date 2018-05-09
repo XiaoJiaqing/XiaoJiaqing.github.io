@@ -26,8 +26,8 @@
             margin: auto;
         }
 
-        .add_value{
-            width: 60%;
+        #add_value{
+            width: 50%;
             height: 50px;
         }
 
@@ -35,14 +35,14 @@
             margin-top: 20px;
         }
 
-        .add_name{
+        #add_name{
             height: 50px;
             width: 20%;
             margin-left: 6px;
         }
 
         .add_banner button{
-            width: 10%;
+            width: 15%;
             height: 50px;
             margin-left: 6px;
         }
@@ -77,8 +77,8 @@
     </div>
     <div class="add_banner" align="center">
         <div class="temp_div">
-        <input type="text"  class="add_value"  width = "1000" placeholder="写下你的诺言">
-        <input type="text"  class="add_name"   placeholder="你的名字">
+        <input type="text"  id="add_value"  width = "1000" placeholder="写下你的诺言">
+        <input type="text"  id="add_name"   placeholder="你的名字">
         <button id="push">提交</button>
         </div>
     </div>
@@ -180,7 +180,7 @@
     var intervalQuery
 
     function funcIntervalQuery() {
-        nebPay.queryPayInfo(serialNumber)   //search transaction result from server (result upload to server by app)
+        nebPay.queryPayInfo(serialNumber)
             .then(function (resp) {
                 console.log("tx result: " + resp)   //resp is a JSON string
                 var respObject = JSON.parse(resp)
