@@ -95,13 +95,13 @@
 
     "use strict";
 
-    var dappAddress = "n1yY2s3tHi2M9N1MaXCyuVecBcGPMMBs9XV";
+    var dappAddress = "n1zaJWigwkGpidjDMrAZQdXkUoDthyogKjx";
 
     var nebulas = require("nebulas"),
         Account = nebulas.Account,
         neb = new nebulas.Neb();
-    neb.setRequest(new nebulas.HttpRequest("https://testnet.nebulas.io"));
-
+    //neb.setRequest(new nebulas.HttpRequest("https://testnet.nebulas.io"));
+    neb.setRequest(new nebulas.HttpRequest("https://mainnet.nebulas.io"));
 
     window.onload = function(){
 
@@ -185,7 +185,7 @@
                 console.log("tx result: " + resp)   //resp is a JSON string
                 var respObject = JSON.parse(resp)
                 if(respObject.code === 0){
-                    alert(`set ${$("#search_value").val()} succeed!`)
+                    alert(`succeed!`)
                     clearInterval(intervalQuery)
                 }
             })
