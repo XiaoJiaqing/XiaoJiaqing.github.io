@@ -144,6 +144,9 @@
 		var ulText = "<ul style=\"list-style-type:none\">";
 		
 		if(myJson.length > 0){
+            
+            myJson = myJson.sort(sortTime);
+
 			for(var i=0;i<myJson.length;i++){
                 var newDate = new Date();
                 newDate.setTime(parseInt(myJson[i].time));
@@ -155,6 +158,10 @@
         myList.innerHTML = ulText;
     }
 
+    function sortTime(a,b) 
+    {   
+        return b.time - a.time ;           
+    }  
 
     var NebPay = require("nebpay");     //https://github.com/nebulasio/nebPay
     var nebPay = new NebPay();
